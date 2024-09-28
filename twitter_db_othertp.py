@@ -31,7 +31,7 @@ client = tweepy.Client(bearer_token=bearer_token, wait_on_rate_limit=True)
 prisma = Prisma()
 
 cache_file = "tweets_cache.json"
-cache_duration = 1800  # 30 minutes in seconds
+cache_duration =  360  # 6 minutes
 
 
 # Function to fetch unique Twitter handles and email subscriptions from DB using Prisma ORM
@@ -203,7 +203,7 @@ async def fetch_and_process_tweets():
     end_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
         seconds=10
     )
-    start_time = end_time - datetime.timedelta(days=2)
+    start_time = end_time - datetime.timedelta(minutes=5)
 
     tweets_data = []
     for handle in twitter_handles_emails:
