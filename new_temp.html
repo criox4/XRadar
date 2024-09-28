@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coin Information</title>
+  <style>
+    a {
+      text-decoration: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 600px;
+      margin: 20px auto;
+      background-color: #e4e6eb;
+      border-radius: 16px;
+      border: 1px solid #d1d5db;
+    }
+
+    .logo {
+      text-align: center;
+      padding: 20px;
+      border-bottom: 1px solid #d1d5db;
+      background-color: #fff;
+    }
+
+    .logo img {
+      vertical-align: middle;
+      margin: 0 4px;
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+      background-color: #fff;
+    }
+
+    .mid-section {
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .image-section img {
+      width: 100%;
+      height: auto;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+
+    .card-content {
+      background-color: white;
+      border-radius: 16px;
+      border: 1px solid #e4e6eb;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .upper-content {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .upper-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .upper-left img {
+      width: 36px;
+      height: 36px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+
+    .text {
+      color: #0d0e0f;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .upper-right img {
+      width: 24px;
+      height: 24px;
+      margin-left: 16px;
+    }
+
+    .price-section,
+    .marketcap-section {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .price-section .price-info {
+      text-align: right;
+      float: right;
+    }
+
+    .percentage {
+      background-color: #e4f7e4;
+      border-radius: 9999px;
+      padding: 4px 8px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    .percentage span {
+      color: #16d013;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .price {
+      color: #0d0e0f;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .value {
+      color: #0d0e0f;
+      font-size: 18px;
+      font-weight: bold;
+      float: right;
+    }
+
+    .quick-buy {
+      display: block;
+      background-color: black;
+      border-radius: 9999px;
+      text-align: center;
+      padding: 12px 0;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+
+    .quick-buy:hover {
+      background-color: #333;
+    }
+
+    .disclaimer {
+      padding: 24px;
+      background-color: white;
+      border-top: 1px solid #d1d5db;
+    }
+
+    .disclaimer-title {
+      color: #0d0e0f;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .disclaimer-text {
+      color: #474952;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- LOGO -->
+    <div class="logo">
+      <a href="#"><img src="https://storage.googleapis.com/termix-prod/Xradar/Frame%205.png" alt="Frame 5" /></a>
+      <a href="#"><img src="https://storage.googleapis.com/termix-prod/Xradar/TermiX.png" alt="TermiX" /></a>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+      <a href="#"><img src="https://storage.googleapis.com/termix-prod/Xradar/x.png" alt="Frame 6" /></a>
+    </div>
+
+    <!-- Mid Section -->
+    <div class="mid-section">
+      <div class="image-section">
+        <!-- <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">
+            Just going to reiterate that I have not created any cryptocurrency
+            except Dogecoin in 2013 (and Bells before that), have not worked
+            on any cryptocurrency since 2014, and will never create or work on
+            any cryptocurrency since those two. Anything claiming I am
+            affiliated is lying.
+          </p>
+          &mdash; Shibetoshi Nakamoto (@BillyM2k)
+          <a href="https://twitter.com/BillyM2k/status/1838845285633777796?ref_src=twsrc%5Etfw">September 25, 2024</a>
+        </blockquote> -->
+        {{ tweet_embed }}
+      </div>
+
+      <div class="card-content">
+        <div class="upper-content">
+          <div class="upper-left">
+            <img src="{{ image_url }}" alt="Icon" />
+            <span class="text">{{ base_token_symbol }}</span>
+          </div>
+
+          <div class="upper-right">
+            {{ social_links }}
+          </div>
+        </div>
+
+        <div class="price-section">
+          <span>Price</span>
+          <span class="price-info">
+            <span class="percentage">{{ price_change_h24 }}%</span>
+            <span class="price">${{ price_usd }}</span>
+          </span>
+        </div>
+
+        <div class="marketcap-section">
+          <span>Marketcap</span>
+          <span class="value">${{ market_cap }}</span>
+        </div>
+
+        <a href="{{ buy_sell_link }}" class="quick-buy">Quick Buy</a>
+      </div>
+    </div>
+
+    <!-- Disclaimer Section -->
+    <div class="disclaimer">
+      <div class="disclaimer-title">Disclaimer</div>
+      <div class="disclaimer-text">
+        Please note that TermiX does not endorse or recommend any specific
+        token or project. Always conduct your own research before investing.
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

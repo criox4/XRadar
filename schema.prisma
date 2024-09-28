@@ -1,0 +1,254 @@
+generator client {
+    provider = "prisma-client-py"
+    recursive_type_depth = 5
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model Agent {
+    name        String
+    description String
+    icon_url    String
+    promptInput Json[]       @default([])
+    id          String       @id
+    agent_id    Int          @unique
+    agent_url   String
+    created_at  DateTime     @default(now())
+    AgentStore  AgentStore[]
+    Workflow    Workflow[]
+
+    @@index([id])
+}
+
+model CustomAgent {
+    id              String       @id
+    custom_agent_id String       @unique
+    name            String
+    description     String
+    icon_url        String
+    agent_url       String
+    promptInput     Json[]       @default([])
+    is_public       Boolean      @default(false)
+    tags            Tags[]       @default([])
+    created_by      String
+    created_at      DateTime     @default(now())
+    AtomicOperation Json[]
+    is_deleted      Boolean      @default(false)
+    AgentStore      AgentStore[]
+    User            User         @relation(fields: [created_by], references: [user_id])
+    Workflow        Workflow[]
+
+    @@index([id])
+}
+
+model AgentStore {
+    store_id        String       @id @default(uuid())
+    agent_id        String?
+    custom_agent_id String?
+    user_id         String?
+    tags            Tags[]       @default([])
+    Agent           Agent?       @relation(fields: [agent_id], references: [id])
+    CustomAgent     CustomAgent? @relation(fields: [custom_agent_id], references: [id])
+    User            User?        @relation(fields: [user_id], references: [user_id])
+
+    @@index([store_id])
+    @@index([agent_id])
+    @@index([user_id])
+}
+
+model User {
+    user_id                 String                    @id @default(uuid())
+    username                String?
+    privyId                 String                    @unique
+    google                  String?                   @unique
+    googleName              String?
+    googleSubject           String?                   @unique
+    email                   String?                   @unique
+    wallet                  String?                   @unique
+    UserType                UserType
+    referral_code           String?                   @unique
+    inviter_user_id         String?
+    point_balance           Int                       @default(100)
+    registration_date       DateTime                  @default(now())
+    walletCreated           Boolean?                  @default(false)
+    CreatedAgents           String[]                  @default([])
+    FavoriteAgents          String[]                  @default(["1", "2", "3", "7"])
+    AgentStore              AgentStore[]
+    ChatHistory             ChatHistory[]
+    CustomAgent             CustomAgent[]
+    Wallet                  Wallet[]
+    UserTwitterSubscription UserTwitterSubscription[]
+
+    @@index([user_id])
+}
+
+model PointFlowRecord {
+    record_id  String   @id @default(uuid())
+    user_id    String
+    flowRoad   FlowRoad
+    flowType   FlowType
+    refId      String?
+    amount     Int
+    extend     Json?
+    createTime DateTime @default(now())
+}
+
+enum FlowRoad {
+    InvitationRewards
+}
+
+enum FlowType {
+    Income
+    Expense
+}
+
+model AtomicOperation {
+    operation_id        String                @id
+    type                String
+    description         String
+    blockchain          String
+    prompts             Json
+    AtomicFunction      String
+    ExecutionOperations ExecutionOperations[]
+    Workflow            Workflow[]            @relation("AtomicOperationToWorkflow")
+
+    @@index([operation_id])
+}
+
+model ChatHistory {
+    chat_id   String   @id @default(uuid())
+    user_id   String
+    input     String
+    response  Json
+    timestamp DateTime
+    User      User     @relation(fields: [user_id], references: [user_id])
+
+    @@index([chat_id])
+}
+
+model ExecutionOperations {
+    execution_id                   String
+    workflowExecutionsExecution_id String
+    atomicOperationOperation_id    String
+    order                          Int
+    status                         ExecutionOperationsStatus
+    ExecutionOperations_id         String                    @id @default(uuid())
+    taskId                         String?
+    response                       String?
+    AtomicOperation                AtomicOperation           @relation(fields: [atomicOperationOperation_id], references: [operation_id])
+    WorkflowExecutions             WorkflowExecutions        @relation(fields: [workflowExecutionsExecution_id], references: [execution_id])
+}
+
+model Transaction {
+    transaction_id     String             @id @default(uuid())
+    wallet_id          String
+    workflow_id        String
+    to_address         String
+    amount             Float
+    timestamp          DateTime           @default(now())
+    exec_op_id         String
+    execution_id       String
+    blockchain         String?
+    transactionHash    String
+    from_address       String
+    WorkflowExecutions WorkflowExecutions @relation(fields: [execution_id], references: [execution_id])
+    Wallet             Wallet             @relation(fields: [wallet_id], references: [wallet_id])
+    Workflow           Workflow           @relation(fields: [workflow_id], references: [workflow_id])
+
+    @@index([transaction_id])
+    @@index([wallet_id])
+    @@index([workflow_id])
+}
+
+model Wallet {
+    wallet_id      String        @id @default(uuid())
+    user_id        String
+    chain_name     String[]
+    chainId        Int[]
+    address        Json
+    privateKey     Json
+    encryptVersion Int           @default(0)
+    Transaction    Transaction[]
+    User           User          @relation(fields: [user_id], references: [user_id])
+
+    @@index([user_id])
+    @@index([wallet_id])
+}
+
+model Workflow {
+    workflow_id           String               @id
+    agent_id              String?
+    operation_id_array    String[]
+    custom_agent_id       String?
+    created_at            DateTime             @default(now())
+    previous_custom_agent String?
+    Transaction           Transaction[]
+    Agent                 Agent?               @relation(fields: [agent_id], references: [id])
+    CustomAgent           CustomAgent?         @relation(fields: [custom_agent_id], references: [id])
+    WorkflowExecutions    WorkflowExecutions[]
+    AtomicOperation       AtomicOperation[]    @relation("AtomicOperationToWorkflow")
+
+    @@index([agent_id])
+    @@index([workflow_id])
+}
+
+model WorkflowExecutions {
+    execution_id        String                   @id @default(uuid())
+    workflowWorkflow_id String
+    start_time          DateTime
+    end_time            DateTime?
+    status              WorkflowExecutionsStatus
+    ExecutionOperations ExecutionOperations[]
+    Transaction         Transaction[]
+    Workflow            Workflow                 @relation(fields: [workflowWorkflow_id], references: [workflow_id])
+}
+
+model UserTwitterSubscription {
+    id            String   @id @default(uuid())
+    user_id       String   @unique
+    twitter_users String[] @default([])
+    email         String
+    created_at    DateTime @default(now())
+    updated_at    DateTime @updatedAt
+
+    User User @relation(fields: [user_id], references: [user_id])
+
+    @@index([user_id])
+}
+
+enum ExecutionOperationsStatus {
+    Pending
+    Completed
+    Failed
+    Initiated
+    Running
+    Stopped
+}
+
+enum UserType {
+    GOOGLE
+    EMAIL
+    WALLET
+}
+
+enum WorkflowExecutionsStatus {
+    Initiated
+    Running
+    Completed
+    Failed
+    Stopped
+}
+
+enum Tags {
+    System
+    Trading
+    Airdrop
+    DeFi
+    Meme
+    AIGC
+    NFT
+}
